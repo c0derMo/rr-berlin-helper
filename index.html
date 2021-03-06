@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Berlin spin helper</title>
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+    <style>
+        .target {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+        .checkboxleft {
+            margin-right: 50%;
+        }
+        .checkboxright {
+            margin-left: 50%;
+        }
+        .footer {
+            bottom: 0;
+            font-style: italic;
+            position: absolute;
+        }
+    </style>
+</head>
+<body style="background: white;">
+    <h1>Berlin Spin helper</h1>
+    <div id="container">
+        <table>
+            <thead>
+                <td>Left player</td>
+                <td></td>
+                <td>Right Player</td>
+            </thead>
+            <tr>
+                <td class="checkboxleft"><input type="checkbox" id="left1"></td>
+                <td class="target">Target 1</td>
+                <td class="checkboxright"><input type="checkbox" id="right1"></td>
+            </tr>
+            <tr>
+                <td class="checkboxleft"><input type="checkbox" id="left2"></td>
+                <td class="target">Target 2</td>
+                <td class="checkboxright"><input type="checkbox" id="right2"></td>
+            </tr>
+            <tr>
+                <td class="checkboxleft"><input type="checkbox" id="left3"></td>
+                <td class="target">Target 3</td>
+                <td class="checkboxright"><input type="checkbox" id="right3"></td>
+            </tr>
+            <tr>
+                <td class="checkboxleft"><input type="checkbox" id="left4"></td>
+                <td class="target">Target 4</td>
+                <td class="checkboxright"><input type="checkbox" id="right4"></td>
+            </tr>
+            <tr>
+                <td class="checkboxleft"><input type="checkbox" id="left5"></td>
+                <td class="target">Target 5</td>
+                <td class="checkboxright"><input type="checkbox" id="right5"></td>
+            </tr>
+        </table>
+    </div>
+    <span class="footer">Just add the image "berlin.png" to OBS and move it to the bottom!</span>
+    <script>
+        document.querySelector("#container").onclick = function() {
+            let state = [];
+            let i = 1;
+            while(i<6) {
+                let obj = {"blue": document.getElementById("left" + i).checked, "red": document.getElementById("right" + i).checked};
+                state.push(obj);
+                i++;
+            }
+            window.comms.send(state);
+        }
+    </script>
+</body>
+</html>
