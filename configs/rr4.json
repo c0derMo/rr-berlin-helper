@@ -1,0 +1,58 @@
+{
+    "width": 1920,
+    "height": 397,
+    "colors": {
+        "left": "0x1629A6FF",
+        "right": "0xA11515FF"
+    },
+    "playerindicators": {
+        "left": {
+            "type": "triangle",
+            "x": 602,
+            "y": 0,
+            "size": 100,
+            "direction": "left-down"
+        },
+        "right": {
+            "type": "triangle",
+            "x": 1315,
+            "y": 0,
+            "size": 100,
+            "direction": "right-down"
+        }
+    },
+    "targetindicators": {
+        "left": {
+            "size": 28,
+            "direction": "left-down",
+            "offsetX": 0,
+            "offsetY": 0
+        },
+        "right": {
+            "size": 28,
+            "direction": "left-up",
+            "offsetX": 0,
+            "offsetY": 58
+        },
+        "1": {
+            "x": 841,
+            "y": 0
+        },
+        "2": {
+            "x": 1074,
+            "y": 0
+        },
+        "3": {
+            "x": 1307,
+            "y": 0
+        },
+        "4": {
+            "x": 841,
+            "y": 161
+        },
+        "5": {
+            "x": 1074,
+            "y": 161
+        }
+    }
+}

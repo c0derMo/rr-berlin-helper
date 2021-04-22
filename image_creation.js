@@ -1,90 +1,65 @@
 const Jimp = require("jimp");
 
-const width = 1920;
-const height = 397;
-
-const red = 0xA11515FF;
-const blue = 0x1629A6FF;
-
-function drawRedPlayer(image) {
+function drawTriangle(image,x,y,size,direction,color) {
+    const directionSplit = direction.split("-")
     let i = 0;
-    while(i<100) {
+    while(i < size+1) {
         let j = 0;
-        while(j < i+1) {
-            image.setPixelColor(red, 1315+j, 99-i);
+        while (j < size-i+1) {
+            let currentX, currentY;
+            if (directionSplit[0] === "left") {
+                currentX = x - j;
+            } else {
+                currentX = x + j;
+            }
+            if (directionSplit[1] === "up") {
+                currentY = y - i;
+            } else {
+                currentY = y + i;
+            }
+            image.setPixelColor(parseInt(color), currentX, currentY);
             j++;
         }
         i++;
     }
 }
 
-function drawBluePlayer(image) {
-    let i = 0;
-    while(i<100) {
-        let j = 0;
-        while(j < i+1) {
-            image.setPixelColor(blue, 602-j, 99-i);
-            j++;
-        }
-        i++;
+function drawPlayerIndicator(image,config,side) {
+    const indicatorConfig = config.playerindicators[side]
+    // TODO: Implement more types
+    if (indicatorConfig.type === "triangle") {
+        drawTriangle(image,indicatorConfig.x,indicatorConfig.y,indicatorConfig.size,indicatorConfig.direction,config.colors[side])
     }
 }
 
-function drawBluePlayerDone(image, idx) {
-    let left = 842 + (((idx)%3)) * 233;
-    let top = 0;
-    if(idx > 2) {
-        top = 161;
-    }
-    let i = 0;
-    while(i<29) {
-        let j = 0;
-        while(j < i+1) {
-            image.setPixelColor(blue, left+i-29, top+j);
-            j++;
-        }
-        i++;
-    }
+function drawTargetIndicator(image,config,side,index) {
+    const offsetX = config.targetindicators[index].x + config.targetindicators[side].offsetX
+    const offsetY = config.targetindicators[index].y + config.targetindicators[side].offsetY
+    drawTriangle(image, offsetX, offsetY, config.targetindicators[side].size, config.targetindicators[side].direction, config.colors[side])
 }
 
-function drawRedPlayerDone(image, idx) {
-    let left = 842 + (((idx)%3)) * 233;
-    let top = 58;
-    if(idx > 2) {
-        top = 216;
-    }
-    let i = 0;
-    while(i<29) {
-        let j = 0;
-        while(j < i+1) {
-            image.setPixelColor(red, left+i-29, top-j);
-            j++;
-        }
-        i++;
-    }
-}
-
-function drawState(state) {
-    new Jimp(width, height, function(err, image) {
+function drawState(config, state) {
+    new Jimp(config.width, config.height, function(err, image) {
         if(err) throw err;
 
-        drawRedPlayer(image);
-        drawBluePlayer(image);
+        drawPlayerIndicator(image,config,"left");
+        drawPlayerIndicator(image,config,"right");
+
         state.forEach(function(elem, idx) {
             if(elem.blue) {
-                drawBluePlayerDone(image, idx);
+                drawTargetIndicator(image, config, "left", idx+1)
             }
             if(elem.red) {
-                drawRedPlayerDone(image, idx);
+                drawTargetIndicator(image, config, "right", idx+1)
             }
-        });
+        })
 
         image.write("berlin.png", (err) => {
             if(err) throw err;
         })
-    });
+    })
 }
 
-// drawState([{"blue": true, "red": true},{"blue": true, "red": true},{"blue": true, "red": true},{"blue": true, "red": true},{"blue": true, "red": true}])
+// drawState(config, [{"blue": true, "red": true},{"blue": true, "red": true},{"blue": true, "red": true},{"blue": true, "red": true},{"blue": true, "red": true}])
 
 module.exports = drawState;

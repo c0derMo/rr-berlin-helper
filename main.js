@@ -2,8 +2,11 @@ const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require("path");
 const createImage = require('./image_creation');
 const requestSpinData = require("./hitmaps_integration")
+const fs = require("fs")
 
 let win;
+
+const drawConfig = JSON.parse(fs.readFileSync("./config.json"))
 
 function createWindow () {
   win = new BrowserWindow({
@@ -40,13 +43,13 @@ ipcMain.on('rr_berlin', (event, data) => {
   if(Date.now() - timeout < 5000) {
     if(tm == undefined) {
       tm = setTimeout(() => {
-        createImage(data);
+        createImage(drawConfig, data);
         tm = undefined;
         timeout = Date.now();
       }, 5000 - (Date.now() - timeout));
     }
   } else {
-    createImage(data);
+    createImage(drawConfig, data);
     timeout = Date.now();
   }
 });
