@@ -4,7 +4,10 @@ contextBridge.exposeInMainWorld("comms", {
     send: (data) => {
         ipcRenderer.send("rr_berlin", data);
     },
-    on: (listener) => {
-        ipcRenderer.on("rr_berlin", listener);
+    onSpinData: (listener) => {
+        ipcRenderer.on("rr_spin_data", listener);
+    },
+    sendOverlayLink: (link) => {
+        ipcRenderer.send("rr_link", link);
     }
 });

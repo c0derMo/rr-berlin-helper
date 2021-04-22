@@ -5,20 +5,31 @@
     <title>Berlin spin helper</title>
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
     <style>
+        table {
+            margin: auto;
+            border: 3px solid pink;
+        }
         .target {
             padding-left: 20px;
             padding-right: 20px;
-        }
-        .checkboxleft {
-            margin-right: 50%;
-        }
-        .checkboxright {
-            margin-left: 50%;
+            width: 60%;
         }
         .footer {
             bottom: 0;
             font-style: italic;
             position: absolute;
+        }
+        input[type=checkbox] {
+            margin: auto;
+        }
+        td {
+            text-align: center;
+        }
+        .spinlinkinput {
+            width: 98%;
+        }
+        .spinlinkstatus {
+            color: red;
         }
     </style>
 </head>
@@ -27,38 +38,45 @@
     <div id="container">
         <table>
             <thead>
-                <td>Left player</td>
+                <td id="playerLeft">Left player</td>
                 <td></td>
-                <td>Right Player</td>
+                <td id="playerRight">Right Player</td>
             </thead>
             <tr>
                 <td class="checkboxleft"><input type="checkbox" id="left1"></td>
-                <td class="target">Target 1</td>
+                <td class="target" id="t1">Target 1</td>
                 <td class="checkboxright"><input type="checkbox" id="right1"></td>
             </tr>
             <tr>
                 <td class="checkboxleft"><input type="checkbox" id="left2"></td>
-                <td class="target">Target 2</td>
+                <td class="target" id="t2">Target 2</td>
                 <td class="checkboxright"><input type="checkbox" id="right2"></td>
             </tr>
             <tr>
                 <td class="checkboxleft"><input type="checkbox" id="left3"></td>
-                <td class="target">Target 3</td>
+                <td class="target" id="t3">Target 3</td>
                 <td class="checkboxright"><input type="checkbox" id="right3"></td>
             </tr>
             <tr>
                 <td class="checkboxleft"><input type="checkbox" id="left4"></td>
-                <td class="target">Target 4</td>
+                <td class="target" id="t4">Target 4</td>
                 <td class="checkboxright"><input type="checkbox" id="right4"></td>
             </tr>
             <tr>
                 <td class="checkboxleft"><input type="checkbox" id="left5"></td>
-                <td class="target">Target 5</td>
+                <td class="target" id="t5">Target 5</td>
                 <td class="checkboxright"><input type="checkbox" id="right5"></td>
             </tr>
         </table>
     </div>
-    <span class="footer">Just add the image "berlin.png" to OBS and move it to the bottom!</span>
+    <br>
+    <br>
+    <div id="spinlinkstatus" class="spinlinkstatus"><br><br></div>
+    <input id="spinlink" placeholder="Spin overlay link" class="spinlinkinput"><br>
+    <button id="send_link">Request spin information</button><br>
+    <span class="footer">
+        <button id="force_redraw">Force redraw</button><br>
+        Just add the image "berlin.png" to OBS and move it to the bottom!</span>
     <script>
         document.querySelector("#container").onclick = function() {
             let state = [];
@@ -70,6 +88,41 @@
             }
             window.comms.send(state);
         }
+
+        document.querySelector("#force_redraw").onclick = function() {
+            let state = [];
+            let i = 1;
+            while(i<6) {
+                let obj = {"blue": document.getElementById("left" + i).checked, "red": document.getElementById("right" + i).checked};
+                state.push(obj);
+                i++;
+            }
+            window.comms.send(state);
+        }
+
+        document.querySelector("#send_link").onclick = function() {
+            window.comms.sendOverlayLink(document.querySelector("#spinlink").value)
+        }
+
+        window.comms.onSpinData((event, data) => {
+            console.log(data);
+            if (data.status === "success") {
+                [1,2,3,4,5].forEach((e) => {
+                    document.querySelector("#t" + e).innerHTML = data.killConditions[e]
+                })
+                document.querySelector("#playerLeft").innerHTML = data.playerOne
+                document.querySelector("#playerRight").innerHTML = data.playerTwo
+                    document.querySelector("#spinlinkstatus").innerHTML = "<br><br>"
+            } else {
+                if (data.status === "wrong_map") {
+                    document.querySelector("#spinlinkstatus").innerHTML = "This spin is not for berlin / Apex Predator!<br>"
+                } else if (data.status === "spin_hasnt_arrived") {
+                    document.querySelector("#spinlinkstatus").innerHTML = "This spin hasn't arrived yet! Please try again once the spin has arrived."
+                } else if (data.status === "error") {
+                    document.querySelector("#spinlinkstatus").innerHTML = "An unknown error has occured. Please make sure your overlay link is correct, and try again."
+                }
+            }
+        });
     </script>
 </body>
 </html>

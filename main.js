@@ -1,13 +1,14 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require("path");
 const createImage = require('./image_creation');
+const requestSpinData = require("./hitmaps_integration")
 
 let win;
 
 function createWindow () {
   win = new BrowserWindow({
-    width: 320,
-    height: 390,
+    width: 370,
+    height: 530,
     webPreferences: {
       preload: path.join(__dirname, "preload_communication.js")
     },
@@ -40,7 +41,6 @@ ipcMain.on('rr_berlin', (event, data) => {
     if(tm == undefined) {
       tm = setTimeout(() => {
         createImage(data);
-        console.log("Function called.");
         tm = undefined;
         timeout = Date.now();
       }, 5000 - (Date.now() - timeout));
@@ -50,3 +50,11 @@ ipcMain.on('rr_berlin', (event, data) => {
     timeout = Date.now();
   }
 });
+
+ipcMain.on('rr_link', (event, data) => {
+  const splitted = data.split("/")
+  const spinID = splitted[splitted.length-1]
+  requestSpinData(spinID, (data) => {
+    event.reply("rr_spin_data", data)
+  })
+})
