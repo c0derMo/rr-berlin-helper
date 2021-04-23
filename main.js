@@ -38,15 +38,19 @@ app.on('activate', () => {
 
 let timeout = 0;
 let tm;
+let newestData;
 
 ipcMain.on('rr_berlin', (event, data) => {
   if(Date.now() - timeout < 5000) {
     if(tm == undefined) {
+      newestData = data;
       tm = setTimeout(() => {
-        createImage(drawConfig, data);
+        createImage(drawConfig, newestData);
         tm = undefined;
         timeout = Date.now();
       }, 5000 - (Date.now() - timeout));
+    } else {
+      newestData = data;
     }
   } else {
     createImage(drawConfig, data);
